@@ -367,7 +367,7 @@ pb_render <- function(self, private, tokens) {
         eta <- " ?s"
       } else {
         #` eta <- vague_dt(eta, format = "terse")
-        eta <- format(as_hms(as.integer(eta)))
+        eta <- format(as.hms(as.integer(eta)))
       }
     }
     str <- sub(str, pattern = ":eta", replacement = eta)
