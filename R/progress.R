@@ -351,27 +351,30 @@ pb_render <- function(self, private, tokens) {
     str <- sub(str, pattern = ":elapsed", replacement = elapsed)
   }
 
-  if (private$has_token["eta"]) {
-    if (is.na(private$total)) {
-      eta <- "?"
+ if (private$has_token["eta"]) {
+  if (is.na(private$total)) {
+    eta <- "?"
+  } else {
+    percent <- private$ratio() * 100
+    elapsed_secs <- Sys.time() - private$start
+	tick_rate <- private$current / as.double(elapsed_secs, units = "secs") #tiger
+	if (is.nan(tick_rate)) tick_rate <- 0 #tiger
+    eta_secs <- if (percent == 100) {
+      0
     } else {
-      percent <- private$ratio() * 100
-      elapsed_secs <- Sys.time() - private$start
-      eta_secs <- if (percent == 100) {
-        0
-      } else {
-        elapsed_secs * (private$total / private$current - 1.0)
-      }
-      eta <- as.difftime(eta_secs, units = "secs")
-      if (is.nan(eta) || eta == Inf) {
-        eta <- " ?s"
-      } else {
-        #` eta <- vague_dt(eta, format = "terse")
-        eta <- format(as.hms(as.integer(eta)))
-      }
+      #` elapsed_secs * (private$total / private$current - 1.0)
+	  (1.0 - private$current / private$total)/tick_rate #tiger
     }
-    str <- sub(str, pattern = ":eta", replacement = eta)
+    eta <- as.difftime(eta_secs, units = "secs")
+    if (is.nan(eta) || eta == Inf) {
+      eta <- " ?s"
+    } else {
+      #` eta <- vague_dt(eta, format = "terse")
+      eta <- format(as.hms(as.integer(eta)))  # tiger org
+    }
   }
+  str <- sub(str, pattern = ":eta", replacement = eta)
+}
 
   if (private$has_token["rate"]) {
     elapsed_secs <- Sys.time() - private$start
