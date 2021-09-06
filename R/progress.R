@@ -363,7 +363,7 @@ pb_render <- function(self, private, tokens) {
       0
     } else {
       #` elapsed_secs * (private$total / private$current - 1.0)
-	  (1.0 - private$current / private$total)/tick_rate * 100 #tiger
+	   (private$total-private$current) / tick_rate #tiger
     }
     eta <- as.difftime(eta_secs, units = "secs")
     if (is.nan(eta) || eta == Inf) {
